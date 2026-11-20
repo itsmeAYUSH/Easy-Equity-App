@@ -151,3 +151,5 @@ in-app purchases plus a server webhook that sets the same `is_premium` fields.
 - Account deletion inside the app (Profile → Delete account) — App Store rule 5.1.1(v).
 - Terms/Privacy consent at onboarding, stored with the same version as the website.
 - AI and mutual-fund risk disclaimers wherever that content appears.
+#   E a s y - E q u i t y - A p p  
+ 
