@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * EasyEquity theme tokens — the web app's palette (easyequity-app/src/index.css),
+ * as RGB channels so Tailwind opacity modifiers work. NativeWind class dark mode.
+ * Keep in sync with src/constants/theme.ts (the same colours for JS: icons, charts).
+ */
+@layer base {
+  :root {
+    --color-background: 249 248 246;
+    --color-foreground: 20 24 31;
+    --color-card: 255 255 255;
+    --color-primary: 29 35 48;
+    --color-primary-foreground: 249 248 246;
+    --color-secondary: 238 236 232;
+    --color-muted: 232 231 227;
+    --color-muted-foreground: 103 111 126;
+    --color-accent: 242 158 13;
+    --color-accent-foreground: 20 24 31;
+    --color-destructive: 220 40 40;
+    --color-border: 220 223 229;
+    --color-bullish: 32 172 107;
+    --color-bullish-bg: 233 251 243;
+    --color-bearish: 220 40 40;
+    --color-bearish-bg: 252 237 237;
+    --color-neutral: 115 123 140;
+    --color-neutral-bg: 241 242 244;
+  }
+
+  .dark,
+  .dark:root {
+    --color-background: 16 19 24;
+    --color-foreground: 244 243 240;
+    --color-card: 22 26 34;
+    --color-primary: 244 243 240;
+    --color-primary-foreground: 16 19 24;
+    --color-secondary: 33 38 48;
+    --color-muted: 39 44 53;
+    --color-muted-foreground: 143 150 163;
+    --color-accent: 244 168 37;
+    --color-accent-foreground: 16 19 24;
+    --color-destructive: 207 48 48;
+    --color-border: 43 48 59;
+    --color-bullish: 40 215 133;
+    --color-bullish-bg: 18 43 31;
+    --color-bearish: 226 80 80;
+    --color-bearish-bg: 46 20 20;
+    --color-neutral: 143 150 163;
+    --color-neutral-bg: 34 37 42;
+  }
+}
