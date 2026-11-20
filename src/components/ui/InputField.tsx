@@ -15,10 +15,10 @@ type Props = TextInputProps & {
 export const InputField = forwardRef<TextInput, Props>(function InputField({ label, error, icon, ...rest }, ref) {
   const p = useColors()
   return (
-    <View className="gap-1.5">
+    <View className="gap-2">
       {label ? <Text className="text-sm font-medium text-foreground">{label}</Text> : null}
       <View
-        className={`h-12 flex-row items-center gap-2 rounded-xl border bg-card px-3 ${error ? "border-destructive" : "border-border"}`}
+        className={`h-12 flex-row items-center gap-2.5 rounded-xl border bg-card px-4 ${error ? "border-destructive" : "border-border"}`}
       >
         {icon ? <Ionicons name={icon} size={18} color={p.mutedForeground} /> : null}
         <TextInput

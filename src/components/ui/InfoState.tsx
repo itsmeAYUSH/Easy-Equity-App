@@ -35,9 +35,11 @@ export function InfoState({ icon, title, body, kind = "empty", buttonLabel, onBu
   return (
     // Classes go on the inner View: NativeWind doesn't style Reanimated's Animated.View.
     <Animated.View style={fadeIn} accessibilityLiveRegion={failed ? "polite" : "none"}>
-      <View className={`items-center gap-2 px-6 ${small ? "py-6" : "py-12"}`}>
-        <Ionicons name={icon} size={30} color={failed ? c.destructive : c.mutedForeground} />
-        <Text accessibilityRole="header" className="mt-1 text-center text-base font-semibold text-foreground">
+      <View className={`items-center gap-2 px-8 ${small ? "py-8" : "py-16"}`}>
+        <View className={`mb-2 h-14 w-14 items-center justify-center rounded-full ${failed ? "bg-bearish-bg" : "bg-secondary"}`}>
+          <Ionicons name={icon} size={26} color={failed ? c.destructive : c.mutedForeground} />
+        </View>
+        <Text accessibilityRole="header" className="text-center text-base font-semibold text-foreground">
           {title}
         </Text>
         {body ? <Text className="max-w-xs text-center text-sm text-muted-foreground">{body}</Text> : null}

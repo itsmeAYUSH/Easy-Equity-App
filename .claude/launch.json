@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "expo-web",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["expo", "start", "--web", "--port", "8082"],
+      "env": { "EXPO_PUBLIC_API_URL": "http://localhost:3999/api", "BROWSER": "none" },
+      "port": 8082
+    }
+  ]
+}

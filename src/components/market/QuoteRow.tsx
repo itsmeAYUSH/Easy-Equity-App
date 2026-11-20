@@ -3,11 +3,14 @@ import { memo, type ReactNode } from "react"
 import { View } from "react-native"
 import { Text } from "@/components/ui/Text"
 
-import { Tappable } from "@/components/ui/Tappable"
+import { ListRow, type GroupPosition } from "@/components/ui/List"
 import { PriceChange } from "@/components/ui/PriceChange"
 import { displaySymbol, fmtPrice } from "@/lib/format"
 
-/** One instrument per row: symbol + name on the left, price + change on the right. */
+/**
+ * One instrument per row: symbol + name on the left, price + change on the right.
+ * `position` joins consecutive rows into one rounded card (see ListRow).
+ */
 export const QuoteRow = memo(function QuoteRow({
   symbol,
   name,
@@ -16,6 +19,7 @@ export const QuoteRow = memo(function QuoteRow({
   currency,
   right,
   onPress,
+  position = "only",
 }: {
   symbol: string
   name?: string | null
@@ -24,19 +28,17 @@ export const QuoteRow = memo(function QuoteRow({
   currency?: string | null
   right?: ReactNode
   onPress?: () => void
+  position?: GroupPosition
 }) {
+  const label = displaySymbol(symbol)
   return (
-    <Tappable
-      shrinkTo={0.98}
-      onPress={onPress ?? (() => router.push({ pathname: "/stock/[symbol]", params: { symbol } }))}
-      className="mx-4 flex-row items-center gap-3 border-b border-border py-3"
-    >
-      <View className="h-10 w-10 items-center justify-center rounded-full bg-secondary">
-        <Text className="text-xs font-bold text-foreground">{displaySymbol(symbol).slice(0, 3)}</Text>
+    <ListRow position={position} onPress={onPress ?? (() => router.push({ pathname: "/stock/[symbol]", params: { symbol } }))}>
+      <View className="h-11 w-11 items-center justify-center rounded-xl bg-secondary">
+        <Text className="text-[11px] font-bold text-foreground">{label.slice(0, 4)}</Text>
       </View>
-      <View className="flex-1">
+      <View className="flex-1 gap-0.5">
         <Text numberOfLines={1} className="text-[15px] font-semibold text-foreground">
-          {displaySymbol(symbol)}
+          {label}
         </Text>
         {name ? (
           <Text numberOfLines={1} className="text-xs text-muted-foreground">
@@ -44,11 +46,11 @@ export const QuoteRow = memo(function QuoteRow({
           </Text>
         ) : null}
       </View>
-      <View className="items-end gap-0.5">
+      <View className="items-end gap-1">
         <Text className="text-[15px] font-semibold text-foreground">{price != null ? fmtPrice(price, currency) : "—"}</Text>
-        {changePct != null ? <PriceChange pct={changePct} size="xs" /> : null}
+        {changePct != null ? <PriceChange pct={changePct} size="xs" variant="pill" /> : null}
       </View>
       {right}
-    </Tappable>
+    </ListRow>
   )
 })

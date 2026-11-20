@@ -21,7 +21,7 @@ function FilterChipsInner<T extends string>({
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerClassName="gap-2 px-4 py-2"
+      contentContainerClassName="gap-2 px-5 py-1"
       keyboardShouldPersistTaps="handled"
     >
       {options.map((o) => {
@@ -37,7 +37,7 @@ function FilterChipsInner<T extends string>({
             aria-selected={active}
             className={`h-9 justify-center rounded-full border px-4 ${active ? "border-primary bg-primary" : "border-border bg-card"}`}
           >
-            <Text className={`text-sm font-medium ${active ? "text-primary-foreground" : "text-foreground"}`}>{o.label}</Text>
+            <Text className={`text-[13px] font-semibold ${active ? "text-primary-foreground" : "text-muted-foreground"}`}>{o.label}</Text>
           </Tappable>
         )
       })}
@@ -57,7 +57,7 @@ export function Segmented<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <View className="flex-row rounded-xl bg-secondary p-1">
+    <View className="flex-row gap-1 rounded-xl border border-border bg-secondary p-1">
       {options.map((o) => {
         const active = o.value === value
         return (
@@ -70,9 +70,11 @@ export function Segmented<T extends string>({
               onChange(o.value)
             }}
             aria-selected={active}
-            className={`h-8 flex-1 items-center justify-center rounded-lg ${active ? "bg-card" : ""}`}
+            className={`h-9 flex-1 items-center justify-center rounded-lg px-1 ${active ? "bg-card" : ""}`}
           >
-            <Text className={`text-xs font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}>{o.label}</Text>
+            <Text numberOfLines={1} className={`text-xs font-semibold ${active ? "text-foreground" : "text-muted-foreground"}`}>
+              {o.label}
+            </Text>
           </Tappable>
         )
       })}

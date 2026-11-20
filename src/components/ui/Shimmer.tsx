@@ -43,18 +43,28 @@ export function Shimmer({
   )
 }
 
-/** Placeholder rows for lists (news, quotes). */
+/** Placeholder cards for lists (news, quotes), shaped like the cards they stand in for. */
 export function ListShimmer({ rows = 6, withImage = false }: { rows?: number; withImage?: boolean }) {
   return (
-    <View className="gap-4 px-4 pt-2">
-      {Array.from({ length: rows }, (_, i) => (
-        <View key={i} className="flex-row gap-3">
-          {withImage ? <Shimmer width={84} height={84} radius={12} /> : null}
-          <View className="flex-1 gap-2 py-1">
-            <Shimmer height={14} width="90%" />
-            <Shimmer height={14} width="70%" />
-            <Shimmer height={10} width="40%" />
+    <View className="gap-3 px-5 pt-2">
+      {withImage ? (
+        <View className="overflow-hidden rounded-3xl border border-border bg-card">
+          <Shimmer height={180} radius={0} />
+          <View className="gap-2.5 p-5">
+            <Shimmer height={12} width="35%" />
+            <Shimmer height={18} width="95%" />
+            <Shimmer height={18} width="70%" />
           </View>
+        </View>
+      ) : null}
+      {Array.from({ length: rows }, (_, i) => (
+        <View key={i} className="flex-row items-center gap-3 rounded-2xl border border-border bg-card p-4">
+          {!withImage ? <Shimmer width={40} height={40} radius={12} /> : null}
+          <View className="flex-1 gap-2">
+            <Shimmer height={14} width="85%" />
+            <Shimmer height={12} width="55%" />
+          </View>
+          {withImage ? <Shimmer width={84} height={84} radius={12} /> : null}
         </View>
       ))}
     </View>

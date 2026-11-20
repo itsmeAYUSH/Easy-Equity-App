@@ -39,7 +39,14 @@ export default function IpoScreen() {
     return [...filtered].sort((a, b) => STATUS_ORDER[a.status] - STATUS_ORDER[b.status])
   }, [ipos.data, filter])
 
-  const renderItem = useCallback(({ item }: { item: Ipo }) => <IpoCard ipo={item} />, [])
+  const renderItem = useCallback(
+    ({ item }: { item: Ipo }) => (
+      <View className="pb-3">
+        <IpoCard ipo={item} />
+      </View>
+    ),
+    [],
+  )
 
   return (
     <Page>
@@ -48,7 +55,11 @@ export default function IpoScreen() {
         data={list}
         renderItem={renderItem}
         keyExtractor={(i) => i.slug}
-        ListHeaderComponent={<FilterChips options={FILTERS} value={filter} onChange={setFilter} />}
+        ListHeaderComponent={
+          <View className="pb-4">
+            <FilterChips options={FILTERS} value={filter} onChange={setFilter} />
+          </View>
+        }
         ListEmptyComponent={
           ipos.isPending || ipos.data?.warming ? (
             <ListShimmer rows={5} />
@@ -60,12 +71,13 @@ export default function IpoScreen() {
         }
         ListFooterComponent={
           list.length ? (
-            <View className="px-4 pb-6 pt-2">
+            <View className="px-5 pt-3">
               <Notice text="GMP is an unofficial grey-market indicator and can change quickly. It is not a guarantee of listing price." />
             </View>
           ) : null
         }
         refreshControl={<ThemedRefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        contentContainerStyle={{ paddingBottom: 40 }}
       />
     </Page>
   )

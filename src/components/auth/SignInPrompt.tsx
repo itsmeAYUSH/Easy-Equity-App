@@ -18,15 +18,17 @@ export function SignInPrompt({
 }) {
   const p = useColors()
   return (
-    <View className="flex-1 items-center justify-center gap-3 px-8 py-16">
-      <View className="h-16 w-16 items-center justify-center rounded-full bg-accent/15">
-        <Ionicons name={icon} size={30} color={p.accent} />
-      </View>
-      <Text className="text-center text-lg font-bold text-foreground">{title}</Text>
-      <Text className="text-center text-sm leading-5 text-muted-foreground">{body}</Text>
-      <View className="mt-2 w-full gap-2">
-        <Button title="Sign in" onPress={() => router.push("/sign-in")} />
-        <Button title="Create a free account" variant="secondary" onPress={() => router.push("/sign-up")} />
+    <View className="flex-1 justify-center px-5 pb-16">
+      <View className="items-center gap-3 rounded-3xl border border-border bg-card px-6 py-8">
+        <View className="mb-1 h-16 w-16 items-center justify-center rounded-full bg-accent/15">
+          <Ionicons name={icon} size={30} color={p.accent} />
+        </View>
+        <Text className="text-center text-lg font-bold text-foreground">{title}</Text>
+        <Text className="text-center text-sm leading-[22px] text-muted-foreground">{body}</Text>
+        <View className="mt-3 w-full gap-3">
+          <Button title="Sign in" onPress={() => router.push("/sign-in")} />
+          <Button title="Create a free account" variant="secondary" onPress={() => router.push("/sign-up")} />
+        </View>
       </View>
     </View>
   )

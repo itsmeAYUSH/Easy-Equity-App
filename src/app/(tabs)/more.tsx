@@ -7,7 +7,10 @@ import type { ReactNode } from "react"
 import { Alert, ScrollView, View } from "react-native"
 import { Text } from "@/components/ui/Text"
 
+import { Button } from "@/components/ui/Button"
 import { Segmented } from "@/components/ui/Chips"
+import { ListGroup } from "@/components/ui/List"
+import { Eyebrow } from "@/components/ui/Notice"
 import { TabHeader } from "@/components/ui/TopBar"
 import { Tappable } from "@/components/ui/Tappable"
 import { Page } from "@/components/ui/Page"
@@ -27,36 +30,47 @@ export default function MoreScreen() {
 
   return (
     <Page>
-      <TabHeader title="More" />
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <TabHeader title="More" subtitle="Account, tools and settings" />
+      <ScrollView contentContainerStyle={{ paddingBottom: 48 }}>
         {userId ? (
-          <Tappable onPress={() => router.push("/profile")} className="mx-4 flex-row items-center gap-3 rounded-2xl border border-border bg-card p-4">
+          <Tappable
+            onPress={() => router.push("/profile")}
+            accessibilityLabel="Profile"
+            className="mx-5 flex-row items-center gap-4 rounded-2xl border border-border bg-card p-4"
+          >
             {profile?.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={{ width: 48, height: 48, borderRadius: 24 }} />
+              <Image source={{ uri: profile.avatar_url }} style={{ width: 52, height: 52, borderRadius: 26 }} />
             ) : (
-              <View className="h-12 w-12 items-center justify-center rounded-full bg-accent/15">
-                <Text className="text-lg font-bold text-accent">{name.slice(0, 1).toUpperCase()}</Text>
+              <View className="h-[52px] w-[52px] items-center justify-center rounded-full bg-accent/15">
+                <Text className="text-xl font-bold text-accent">{name.slice(0, 1).toUpperCase()}</Text>
               </View>
             )}
-            <View className="flex-1">
-              <Text className="text-base font-semibold text-foreground">{name}</Text>
-              <Text className="text-xs text-muted-foreground">{profile?.email ?? ""}</Text>
+            <View className="flex-1 gap-1">
+              <View className="flex-row items-center gap-2">
+                <Text numberOfLines={1} className="flex-shrink text-base font-semibold text-foreground">
+                  {name}
+                </Text>
+                <View className={`rounded-full px-2 py-0.5 ${isPro ? "bg-accent" : "bg-secondary"}`}>
+                  <Text className={`text-[10px] font-bold ${isPro ? "text-accent-foreground" : "text-muted-foreground"}`}>{isPro ? "PRO" : "FREE"}</Text>
+                </View>
+              </View>
+              <Text numberOfLines={1} className="text-xs text-muted-foreground">
+                {profile?.email ?? ""}
+              </Text>
             </View>
-            <View className={`rounded-md px-2 py-0.5 ${isPro ? "bg-accent" : "bg-secondary"}`}>
-              <Text className={`text-[11px] font-bold ${isPro ? "text-accent-foreground" : "text-foreground"}`}>{isPro ? "PRO" : "FREE"}</Text>
-            </View>
+            <Ionicons name="chevron-forward" size={18} color={p.mutedForeground} />
           </Tappable>
         ) : (
-          <View className="mx-4 gap-3 rounded-2xl border border-border bg-card p-4">
-            <Text className="text-base font-semibold text-foreground">Sign in to EasyEquity</Text>
-            <Text className="text-sm text-muted-foreground">Use the same account as the website: your watchlist, portfolio and alerts sync everywhere.</Text>
-            <View className="flex-row gap-2">
-              <Tappable onPress={() => router.push("/sign-in")} className="h-11 flex-1 items-center justify-center rounded-xl bg-primary">
-                <Text className="font-semibold text-primary-foreground">Sign in</Text>
-              </Tappable>
-              <Tappable onPress={() => router.push("/sign-up")} className="h-11 flex-1 items-center justify-center rounded-xl border border-border">
-                <Text className="font-semibold text-foreground">Sign up</Text>
-              </Tappable>
+          <View className="mx-5 gap-4 rounded-2xl border border-border bg-card p-5">
+            <View className="gap-1.5">
+              <Text className="text-base font-semibold text-foreground">Sign in to EasyEquity</Text>
+              <Text className="text-sm leading-5 text-muted-foreground">
+                Use the same account as the website: your watchlist, portfolio and alerts sync everywhere.
+              </Text>
+            </View>
+            <View className="flex-row gap-3">
+              <Button title="Sign in" onPress={() => router.push("/sign-in")} className="flex-1" />
+              <Button title="Sign up" variant="secondary" onPress={() => router.push("/sign-up")} className="flex-1" />
             </View>
           </View>
         )}
@@ -64,18 +78,18 @@ export default function MoreScreen() {
         <Group title="Your tools">
           <Row icon="notifications-outline" label="Notifications" badge={userId ? unread : 0} href={userId ? "/notifications" : "/sign-in"} />
           <Row icon="alarm-outline" label="Price alerts" href={userId ? "/alerts" : "/sign-in"} />
-          <Row icon="diamond-outline" label={isPro ? "EasyEquity Pro" : "Upgrade to Pro"} href="/pro" />
+          <Row icon="diamond-outline" label={isPro ? "EasyEquity Pro" : "Upgrade to Pro"} href="/pro" last />
         </Group>
 
         <Group title="Research">
           <Row icon="search-outline" label="Search stocks & crypto" href="/search" />
           <Row icon="funnel-outline" label="Stock screener" href="/screener" />
           <Row icon="pie-chart-outline" label="Mutual funds" href="/mutual-funds" />
-          <Row icon="calculator-outline" label="SIP & CAGR calculators" href="/calculators" />
+          <Row icon="calculator-outline" label="SIP & CAGR calculators" href="/calculators" last />
         </Group>
 
         <Group title="Appearance">
-          <View className="px-4 py-3">
+          <View className="p-3">
             <Segmented<ThemeMode>
               options={[
                 { value: "system", label: "System" },
@@ -93,11 +107,11 @@ export default function MoreScreen() {
           <Row icon="document-text-outline" label="Terms of Service" url={LEGAL_PAGES.terms} />
           <Row icon="shield-checkmark-outline" label="Privacy Policy" url={LEGAL_PAGES.privacy} />
           <Row icon="alert-circle-outline" label="Disclaimer" url={LEGAL_PAGES.disclaimer} />
-          <Row icon="mail-outline" label="Contact us" url={LEGAL_PAGES.contact} />
+          <Row icon="mail-outline" label="Contact us" url={LEGAL_PAGES.contact} last />
         </Group>
 
         {userId ? (
-          <View className="mx-4 mt-6">
+          <View className="mx-5 mt-8">
             <Tappable
               onPress={() =>
                 Alert.alert("Sign out?", undefined, [
@@ -113,7 +127,7 @@ export default function MoreScreen() {
           </View>
         ) : null}
 
-        <Text className="mt-6 text-center text-xs text-muted-foreground">
+        <Text className="mt-8 px-8 text-center text-xs leading-5 text-muted-foreground">
           EasyEquity v{Constants.expoConfig?.version ?? "1.0.0"} · Information only, not investment advice.
         </Text>
       </ScrollView>
@@ -123,32 +137,52 @@ export default function MoreScreen() {
 
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View className="mt-6">
-      <Text className="px-5 pb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</Text>
-      <View className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">{children}</View>
+    <View className="mt-8">
+      <Eyebrow className="px-6 pb-2.5">{title}</Eyebrow>
+      <ListGroup>{children}</ListGroup>
     </View>
   )
 }
 
-function Row({ icon, label, href, url, badge }: { icon: IconName; label: string; href?: Href; url?: string; badge?: number }) {
+function Row({
+  icon,
+  label,
+  href,
+  url,
+  badge,
+  last = false,
+}: {
+  icon: IconName
+  label: string
+  href?: Href
+  url?: string
+  badge?: number
+  /** The final row draws no divider under itself. */
+  last?: boolean
+}) {
   const { colors: p } = useAppearance()
   return (
     <Tappable
-      shrinkTo={0.98}
+      shrinkTo={1}
       onPress={() => {
         if (href) router.push(href)
         else if (url) void WebBrowser.openBrowserAsync(url, { controlsColor: p.accent })
       }}
-      className="flex-row items-center gap-3 border-b border-border px-4 py-3.5"
+      accessibilityLabel={label}
+      className="flex-row items-center gap-3 pl-4"
     >
-      <Ionicons name={icon} size={20} color={p.foreground} />
-      <Text className="flex-1 text-[15px] text-foreground">{label}</Text>
-      {badge ? (
-        <View className="min-w-[20px] items-center rounded-full bg-destructive px-1.5">
-          <Text className="text-[11px] font-bold text-white">{badge}</Text>
-        </View>
-      ) : null}
-      <Ionicons name={url ? "open-outline" : "chevron-forward"} size={16} color={p.mutedForeground} />
+      <View className="h-8 w-8 items-center justify-center rounded-lg bg-secondary">
+        <Ionicons name={icon} size={17} color={p.foreground} />
+      </View>
+      <View className={`flex-1 flex-row items-center gap-3 py-3.5 pr-4 ${last ? "" : "border-b border-border"}`}>
+        <Text className="flex-1 text-[15px] text-foreground">{label}</Text>
+        {badge ? (
+          <View className="h-5 min-w-[20px] items-center justify-center rounded-full bg-destructive px-1.5">
+            <Text className="text-[11px] font-bold text-white">{badge > 99 ? "99+" : badge}</Text>
+          </View>
+        ) : null}
+        <Ionicons name={url ? "open-outline" : "chevron-forward"} size={16} color={p.mutedForeground} />
+      </View>
     </Tappable>
   )
 }
