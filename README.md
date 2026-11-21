@@ -75,7 +75,8 @@ EAS creates and keeps the signing key for you.
 
 | What | Where | Why |
 |---|---|---|
-| Add `easyequity://auth/callback` (and `exp://**` for Expo Go) | Supabase → Authentication → URL Configuration → Redirect URLs | Google sign-in returns to the app through this link |
+| Add `easyequity://auth/callback` (and `exp://**` for Expo Go) | Supabase → Authentication → URL Configuration → Redirect URLs | Google sign-in returns to the app through this link. A link missing from this list is replaced by the Site URL, so the user lands on the website instead |
+| Site URL `https://www.easyequity.in.net` | Supabase → Authentication → URL Configuration → Site URL | The fallback above, and where confirmation emails lead; it must not be an old domain such as the `vercel.app` one |
 | App id `net.in.easyequity.app` | `app.json` (`ios.bundleIdentifier`, `android.package`) | Taken from the domain easyequity.in.net; change it before the first store build if you want another |
 | `eas init` | once, in this folder | Links the project to your Expo account for EAS builds |
 
