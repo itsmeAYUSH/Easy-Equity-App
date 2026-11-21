@@ -15,6 +15,11 @@ export function displaySymbol(symbol: string): string {
   return symbol.replace(/\.(NS|BO)$/i, "").replace(/^\^/, "")
 }
 
+/** Best guess at a symbol's quote currency when no quote is at hand: crypto pairs are USD, the rest INR. */
+export function guessCurrency(symbol: string): "USD" | "INR" {
+  return /-USDT?$/i.test(symbol.trim()) ? "USD" : "INR"
+}
+
 export function fmtINR(v: number | null | undefined, maxFrac = 2): string {
   if (v == null || isNaN(v)) return "—"
   const sign = v < 0 ? "-" : ""

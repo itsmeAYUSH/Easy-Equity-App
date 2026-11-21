@@ -17,6 +17,7 @@ import * as Network from "expo-network"
 import { useEffect, type ReactNode } from "react"
 import { AppState, Platform, type AppStateStatus } from "react-native"
 
+import { isAiPlaceholder } from "@/lib/ai"
 import { storage } from "@/lib/storage"
 import { queryClient } from "@/queries/client"
 import { shouldPersistQuery } from "@/queries/keys"
@@ -28,7 +29,7 @@ const persister = createAsyncStoragePersister({
 })
 
 /** Bump when a persisted response shape changes, so old caches are dropped. */
-const CACHE_BUSTER = "1"
+const CACHE_BUSTER = "2"
 
 function syncFocus(status: AppStateStatus) {
   if (Platform.OS !== "web") focusManager.setFocused(status === "active")
@@ -61,7 +62,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         buster: CACHE_BUSTER,
         maxAge: 24 * 60 * 60_000,
         dehydrateOptions: {
-          shouldDehydrateQuery: (q) => q.state.status === "success" && shouldPersistQuery(q.queryKey),
+          // An AI "warming up" placeholder is never saved: the next launch asks again.
+          shouldDehydrateQuery: (q) =>
+            q.state.status === "success" && shouldPersistQuery(q.queryKey) && !isAiPlaceholder(q.state.data),
         },
       }}
     >

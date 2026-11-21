@@ -10,24 +10,33 @@ import type {
   AppNotification,
   AppUser,
   Article,
+  DailyDigest,
+  EarningsEvent,
   EmailPrefs,
   EmailPrefsResponse,
+  FearGreed,
+  ForexResponse,
   Holding,
   HistoryRange,
+  MacroResponse,
   MarketAnalysis,
   MoversResponse,
   MutualFund,
   MutualFundSearchResult,
+  PortfolioAiResponse,
+  PortfolioDividends,
   PremiumStatus,
   PriceAlert,
   PriceHistory,
   ProfileUpdate,
   Quote,
   ScreenerRow,
+  SectorIntelligence,
   SimpleExplanation,
   StockAnalysis,
   SymbolSearchResult,
   Ticker,
+  UsageInfo,
   WatchlistItem,
 } from "@/lib/types"
 
@@ -56,13 +65,39 @@ export const marketApi = {
     request<{ rows: ScreenerRow[]; sectors: string[]; updatedAt: string }>("/market/screener", { signal, anonymous: true }),
   commodities: (signal?: AbortSignal) =>
     request<{ commodities: Ticker[]; updatedAt: string }>("/market/commodities", { signal, anonymous: true }),
-  fearGreed: (signal?: AbortSignal) =>
-    request<{ value: number; classification: string }>("/market/fear-greed", { signal, anonymous: true }),
+  fearGreed: (signal?: AbortSignal) => request<FearGreed>("/market/fear-greed", { signal, anonymous: true }),
+  forex: (signal?: AbortSignal) => request<ForexResponse>("/market/forex", { signal, anonymous: true }),
+  macro: (signal?: AbortSignal) => request<MacroResponse>("/market/macro", { signal, anonymous: true }),
+}
+
+export const calendarApi = {
+  earnings: (signal?: AbortSignal) =>
+    request<{ events: EarningsEvent[]; updatedAt: string }>("/calendar/earnings", { signal, anonymous: true }),
+}
+
+export const usageApi = {
+  /** Today's AI analyses for the signed-in user (the limit the server enforces). */
+  get: () => request<UsageInfo>("/usage"),
 }
 
 export const aiApi = {
   marketAnalysis: (signal?: AbortSignal) =>
     request<MarketAnalysis>("/ai/market-analysis", { signal, timeoutMs: AI_TIMEOUT_MS }),
+  dailyDigest: (signal?: AbortSignal) => request<DailyDigest>("/ai/daily-digest", { signal, timeoutMs: AI_TIMEOUT_MS }),
+  sectorAnalysis: (signal?: AbortSignal) =>
+    request<SectorIntelligence>("/ai/sector-analysis", { signal, timeoutMs: AI_TIMEOUT_MS }),
+  /** Portfolio AI (Pro): holdings as "SYMBOL:quantity@avgPrice". */
+  portfolioAnalysis: async (stocks: string[]) => {
+    const data = await request<PortfolioAiResponse>("/ai/query", {
+      method: "POST",
+      body: { type: "portfolio", payload: { stocks } },
+      timeoutMs: AI_TIMEOUT_MS,
+    })
+    if (data?.success === false) {
+      throw new HttpError(data.message || "AI analysis is temporarily unavailable. Please try again shortly.", 503)
+    }
+    return data
+  },
   stockAnalysis: async (stock: string) => {
     const data = await request<StockAnalysis & { success?: boolean; message?: string }>("/ai/stock-analysis", {
       method: "POST",
@@ -93,6 +128,7 @@ export const portfolioApi = {
   add: (holding: { symbol: string; quantity: number; avg_price: number; notes?: string }) =>
     request<Holding>("/portfolio", { method: "POST", body: holding }),
   remove: (id: string) => request<{ message: string }>(`/portfolio/${encodeURIComponent(id)}`, { method: "DELETE" }),
+  dividends: () => request<PortfolioDividends>("/portfolio/dividends"),
 }
 
 export const alertsApi = {
@@ -133,6 +169,8 @@ export const emailApi = {
 }
 
 export const accountApi = {
+  /** Everything EasyEquity stores about the signed-in user (data-rights export). */
+  export: () => request<Record<string, unknown>>("/account/export"),
   /** Permanently delete the account (App Store rule 5.1.1(v)). `confirm` must be "DELETE". */
   delete: (confirm: string) => request<{ deleted: boolean }>("/account", { method: "DELETE", body: { confirm } }),
 }

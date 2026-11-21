@@ -11,7 +11,7 @@
     "start:go": "expo start --go",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web",
+    "web": "node scripts/web-dev.mjs",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test src/lib/__tests__/*.test.ts",

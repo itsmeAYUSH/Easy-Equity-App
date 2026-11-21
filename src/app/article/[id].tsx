@@ -7,16 +7,16 @@ import { ScrollView, Share, View } from "react-native"
 import { Text } from "@/components/ui/Text"
 
 import { errorMessage } from "@/api/errors"
-import { ImpactBadge } from "@/components/news/NewsCard"
+import { ImpactBadge, NewsCard } from "@/components/news/NewsCard"
 import { Button } from "@/components/ui/Button"
 import { InfoState } from "@/components/ui/InfoState"
 import { Notice } from "@/components/ui/Notice"
-import { HeaderIcon, TopBar } from "@/components/ui/TopBar"
+import { HeaderIcon, SectionHeading, TopBar } from "@/components/ui/TopBar"
 import { Tappable } from "@/components/ui/Tappable"
 import { Page } from "@/components/ui/Page"
 import { ListShimmer, Shimmer } from "@/components/ui/Shimmer"
 import { AI_DISCLAIMER } from "@/constants/legal"
-import { useArticle, useExplainArticle } from "@/hooks/use-articles"
+import { useArticle, useArticles, useExplainArticle } from "@/hooks/use-articles"
 import { SITE_URL } from "@/lib/config"
 import { CATEGORY_LABEL, fmtDateTime, toYahooSymbol } from "@/lib/format"
 import { cleanNewsText, repeatsTitle } from "@/lib/text"
@@ -30,6 +30,8 @@ export default function ArticleScreen() {
   const p = useColors()
 
   const a = article.data
+  const related = useArticles({ category: a?.category, limit: 8 }, { enabled: !!a?.category })
+  const relatedList = (related.data ?? []).filter((r) => r.id !== a?.id).slice(0, 4)
   const title = cleanNewsText(a?.title)
   const summary = cleanNewsText(a?.summary)
   const content = cleanNewsText(a?.content)
@@ -165,6 +167,16 @@ export default function ArticleScreen() {
               />
             ) : null}
           </View>
+          {relatedList.length ? (
+            <>
+              <SectionHeading title="Related news" subtitle={CATEGORY_LABEL[a.category] ?? null} />
+              <View className="gap-3">
+                {relatedList.map((r) => (
+                  <NewsCard key={r.id} article={r} />
+                ))}
+              </View>
+            </>
+          ) : null}
         </ScrollView>
       )}
     </Page>

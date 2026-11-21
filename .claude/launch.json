@@ -3,9 +3,9 @@
   "configurations": [
     {
       "name": "expo-web",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["expo", "start", "--web", "--port", "8082"],
-      "env": { "EXPO_PUBLIC_API_URL": "http://localhost:3999/api", "BROWSER": "none" },
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/web-dev.mjs", "--port", "8082"],
+      "env": { "BROWSER": "none" },
       "port": 8082
     }
   ]

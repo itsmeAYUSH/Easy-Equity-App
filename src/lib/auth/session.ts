@@ -18,6 +18,8 @@ export type SessionState = {
   createAccount: (name: string, email: string, password: string) => Promise<{ needsConfirmation: boolean }>
   continueWithGoogle: () => Promise<void>
   sendPasswordReset: (email: string) => Promise<void>
+  /** Set a new password for the signed-in user (also lets a Google user sign in with email). */
+  changePassword: (password: string) => Promise<void>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
 }

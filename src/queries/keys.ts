@@ -7,6 +7,7 @@
 export const qk = {
   me: (uid: string | undefined) => ["me", uid] as const,
   premium: (uid: string | undefined) => ["premium", uid] as const,
+  usage: (uid: string | undefined) => ["usage", uid] as const,
 
   articles: (params: { category?: string; search?: string; terms?: string; limit?: number } = {}) =>
     ["articles", params] as const,
@@ -21,8 +22,13 @@ export const qk = {
   screener: ["market", "screener"] as const,
   commodities: ["market", "commodities"] as const,
   fearGreed: ["market", "fear-greed"] as const,
+  forex: ["market", "forex"] as const,
+  macro: ["market", "macro"] as const,
+  earnings: ["market", "earnings"] as const,
 
   marketAnalysis: ["ai", "market-analysis"] as const,
+  dailyDigest: ["ai", "daily-digest"] as const,
+  sectorAnalysis: ["ai", "sector-analysis"] as const,
   stockAnalysis: (symbol: string) => ["ai", "stock-analysis", symbol] as const,
 
   ipos: ["ipo", "list"] as const,
@@ -34,6 +40,8 @@ export const qk = {
 
   watchlist: (uid: string | undefined) => ["watchlist", uid] as const,
   portfolio: (uid: string | undefined) => ["portfolio", uid] as const,
+  dividends: (uid: string | undefined, holdingsKey: string) => ["dividends", uid, holdingsKey] as const,
+  portfolioAi: (uid: string | undefined) => ["portfolio-ai", uid] as const,
   priceAlerts: (uid: string | undefined) => ["alerts", "price", uid] as const,
   notifications: (uid: string | undefined) => ["alerts", "notifications", uid] as const,
   emailPrefs: (uid: string | undefined) => ["email-prefs", uid] as const,

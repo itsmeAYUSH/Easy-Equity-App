@@ -2,6 +2,9 @@
  * NSE open/closed status, from the website's lib/marketHolidays.ts and
  * IndianMarketStatus. UPDATE THE HOLIDAY LIST EACH DECEMBER (same as the web).
  */
+/** The year the list below covers. */
+export const MARKET_HOLIDAYS_YEAR = 2026
+
 export const MARKET_HOLIDAYS: { date: string; name: string }[] = [
   { date: "2026-01-15", name: "Maharashtra Municipal Elections" },
   { date: "2026-01-26", name: "Republic Day" },
@@ -16,6 +19,7 @@ export const MARKET_HOLIDAYS: { date: string; name: string }[] = [
   { date: "2026-09-14", name: "Ganesh Chaturthi" },
   { date: "2026-10-02", name: "Mahatma Gandhi Jayanti" },
   { date: "2026-10-20", name: "Dussehra" },
+  { date: "2026-11-08", name: "Diwali Laxmi Pujan (Sunday; Muhurat trading, timing per NSE)" },
   { date: "2026-11-10", name: "Diwali Balipratipada" },
   { date: "2026-11-24", name: "Prakash Gurpurb Sri Guru Nanak Dev" },
   { date: "2026-12-25", name: "Christmas" },
@@ -51,6 +55,11 @@ export function nseStatus(now: Date = new Date()): MarketStatus {
   if (minutes >= 9 * 60 && minutes < 9 * 60 + 15) return { state: "pre-open", label: "Pre-open" }
   if (minutes >= 9 * 60 + 15 && minutes < 15 * 60 + 30) return { state: "open", label: "Market open" }
   return { state: "closed", label: minutes < 9 * 60 ? "Opens 9:15 IST" : "Closed" }
+}
+
+/** Today's date in India as YYYY-MM-DD. */
+export function todayInIndia(now: Date = new Date()): string {
+  return indiaParts(now).date
 }
 
 /** True during NSE trading hours: live prices are worth polling more often. */

@@ -40,6 +40,31 @@ export function Metric({ label, value, valueClassName = "" }: { label: string; v
   )
 }
 
+/** One "label ……… value" line inside a card (breakdowns, rates, timelines). */
+export function KeyValue({
+  label,
+  value,
+  valueClassName = "",
+  hint,
+  divider = true,
+}: {
+  label: string
+  value: ReactNode
+  valueClassName?: string
+  hint?: string | null
+  divider?: boolean
+}) {
+  return (
+    <View className={`flex-row items-center justify-between gap-3 py-2.5 ${divider ? "border-b border-border/70" : ""}`}>
+      <View className="flex-1">
+        <Text className="text-sm text-muted-foreground">{label}</Text>
+        {hint ? <Text className="text-[11px] text-muted-foreground/80">{hint}</Text> : null}
+      </View>
+      {typeof value === "string" ? <Text className={`text-sm font-semibold text-foreground ${valueClassName}`}>{value}</Text> : value}
+    </View>
+  )
+}
+
 /** Small uppercase label above a card's content. */
 export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <Text className={`text-[11px] font-semibold uppercase tracking-wider text-muted-foreground ${className}`}>{children}</Text>

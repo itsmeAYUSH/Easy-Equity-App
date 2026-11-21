@@ -1,3 +1,4 @@
+import Ionicons from "@expo/vector-icons/Ionicons"
 import { FlashList } from "@shopify/flash-list"
 import { router } from "expo-router"
 import { useCallback, useMemo, useState } from "react"
@@ -13,6 +14,10 @@ import { FilterChips, type ChipOption } from "@/components/ui/Chips"
 import { InfoState } from "@/components/ui/InfoState"
 import { HeaderIcon, SectionHeading, TabHeader } from "@/components/ui/TopBar"
 import { Page } from "@/components/ui/Page"
+import { Pill, sentimentPill } from "@/components/ui/Pill"
+import { Tappable } from "@/components/ui/Tappable"
+import { useDailyDigest } from "@/hooks/use-ai"
+import { useColors } from "@/lib/appearance"
 import { ListShimmer } from "@/components/ui/Shimmer"
 import { useNotifications } from "@/hooks/use-alerts"
 import { useArticles } from "@/hooks/use-articles"
@@ -95,6 +100,7 @@ export default function NewsScreen() {
           <View className="gap-4 pb-2">
             <TickerStrip />
             <FilterChips options={CATEGORIES} value={category} onChange={setCategory} />
+            {category === "all" ? <DigestTeaser /> : null}
           </View>
         }
         ListEmptyComponent={
@@ -117,6 +123,33 @@ export default function NewsScreen() {
         contentContainerStyle={{ paddingBottom: 32 }}
       />
     </Page>
+  )
+}
+
+/** The AI daily digest in one card: overall mood and the first lines of the summary. */
+function DigestTeaser() {
+  const p = useColors()
+  const digest = useDailyDigest()
+  const d = digest.data
+  if (!d || digest.warming || !d.executiveSummary) return null
+  const t = sentimentPill(d.overallSentiment)
+  return (
+    <Tappable
+      shrinkTo={0.98}
+      onPress={() => router.push("/digest")}
+      accessibilityLabel="Open the daily digest"
+      className="mx-5 gap-2.5 rounded-2xl border border-accent/30 bg-accent/10 p-4"
+    >
+      <View className="flex-row items-center gap-2">
+        <Ionicons name="sparkles" size={16} color={p.accent} />
+        <Text className="flex-1 text-sm font-bold text-foreground">Today&apos;s AI digest</Text>
+        {d.overallSentiment ? <Pill label={d.overallSentiment} tone={t.tone} icon={t.icon} size="xs" /> : null}
+      </View>
+      <Text numberOfLines={3} className="text-[13px] leading-5 text-foreground">
+        {d.executiveSummary}
+      </Text>
+      <Text className="text-xs font-semibold text-accent">Read the digest →</Text>
+    </Tappable>
   )
 }
 

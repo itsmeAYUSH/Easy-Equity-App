@@ -182,9 +182,129 @@ export interface AppNotification {
   created_at: string
 }
 
+/** Crypto Fear & Greed (GET /market/fear-greed), history oldest-first. */
+export interface FearGreed {
+  value: number
+  classification: string
+  history?: { value: number; timestamp: string }[]
+}
+
+/** ₹ per one unit of each currency (GET /market/forex). */
+export interface ForexResponse {
+  base: string
+  rates: Record<string, number>
+  updatedAt: string
+}
+
+/** India macro indicators from the World Bank (GET /market/macro). */
+export interface MacroResponse {
+  country: string
+  indicators: { indicator: string; code: string; value: number; year: string }[]
+  updatedAt: string
+}
+
+/** GET /calendar/earnings (Finnhub, next ~2 weeks). */
+export interface EarningsEvent {
+  symbol: string
+  date: string
+  epsEstimate: number | null
+  epsActual: number | null
+  hour: string | null
+}
+
+/** GET /usage: today's AI analyses. remaining/used are null for Pro (no limit). */
+export interface UsageInfo {
+  limit: number
+  remaining: number | null
+  used: number | null
+  unlimited: boolean
+}
+
+/** GET /portfolio/dividends (server services/dividends.ts). */
+export interface PortfolioDividends {
+  holdings: {
+    symbol: string
+    quantity: number
+    avgPrice: number
+    /** Dividend per share paid in the last 12 months. */
+    last12mPerShare: number
+    /** last12mPerShare × quantity: a rough yearly figure if dividends repeat. */
+    estAnnualIncome: number
+    /** Dividend per share as % of your average price. */
+    yieldOnCostPct: number | null
+    payments: { date: string; amount: number }[]
+  }[]
+  totalEstAnnualIncome: number
+  /** Holdings we couldn't get dividend data for. */
+  unavailable: string[]
+}
+
+/** POST /ai/query (Portfolio AI, Pro). `result` is the model's free-form JSON. */
+export interface PortfolioAiResponse {
+  type: string
+  result: Record<string, unknown>
+  generatedAt: string
+  disclaimer: string
+  success?: false
+  message?: string
+}
+
+/** AI fields every shared analysis carries (GET /ai/*). */
+interface SharedAiMeta {
+  success?: boolean
+  source?: string
+  aiStatus?: string
+  message?: string
+  disclaimer: string
+  generatedAt: string
+  articlesAnalyzed?: number
+  loginHint?: string
+}
+
+export type Sentiment = "Bullish" | "Bearish" | "Neutral"
+
+/** GET /ai/daily-digest */
+export interface DailyDigest extends SharedAiMeta {
+  executiveSummary: string
+  overallSentiment: Sentiment
+  sentimentScore: number
+  sections: {
+    title: string
+    category: string
+    sentiment: Sentiment
+    summary: string
+    highlights: string[]
+    watchlist: string[]
+    impactLevel: "High" | "Medium" | "Low"
+  }[]
+  keyTakeaways: string[]
+}
+
+/** GET /ai/sector-analysis */
+export interface SectorIntelligence extends SharedAiMeta {
+  sectors: {
+    name: string
+    outlook: Sentiment
+    confidence: number
+    summary: string
+    keyDrivers: string[]
+    momentumStocks: string[]
+    riskFactors: string[]
+    shortTermView: string
+    longTermView: string
+    trendStrength: "Strong" | "Moderate" | "Weak"
+  }[]
+  crossSectorInsights: string[]
+  topSectorToWatch: string
+  weakestSector: string
+}
+
 /** AI: "Stocks to watch" and sector outlook (GET /ai/market-analysis). */
 export interface MarketAnalysis {
   success?: boolean
+  source?: string
+  aiStatus?: string
+  message?: string
   stocksToWatch: {
     asset: string
     sentiment: string
@@ -219,6 +339,9 @@ export interface StockAnalysis {
   pivotPoint?: string | number
   analysis?: string
   aiReasoning?: string
+  liveDataAvailable?: boolean
+  dataSource?: string
+  currency?: string | null
   disclaimer?: string
   generatedAt?: string
 }
@@ -242,8 +365,17 @@ export interface MutualFund {
   category: string | null
   latestNav: number | null
   latestDate: string | null
-  returns: { r1y: number | null; r3y: number | null; r5y: number | null }
-  /** Newest first, dates as DD-MM-YYYY (mfapi.in). */
+  inceptionDate?: string | null
+  /** 1M/6M/1Y absolute %; 3Y/5Y annualised (CAGR); All annualised once a year old. */
+  returns: {
+    r1m?: number | null
+    r6m?: number | null
+    r1y: number | null
+    r3y: number | null
+    r5y: number | null
+    rAll?: number | null
+  }
+  /** Newest first, dates as DD-MM-YYYY (mfapi.in). Daily for a year, thinned before. */
   history: { date: string; nav: number }[]
 }
 

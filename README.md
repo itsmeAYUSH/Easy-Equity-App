@@ -1,8 +1,11 @@
 # EasyEquity — mobile app
 
 The iOS / Android app for [EasyEquity](https://www.easyequity.in.net): market news with AI
-impact tags, live markets, stock pages with charts and AI analysis, IPOs with GMP, mutual
-funds, a screener, a watchlist, a portfolio tracker and price alerts.
+impact tags and a daily AI digest, live markets (heatmap, breadth, commodities, currencies,
+macro), stock pages with charts and AI analysis, sector intelligence, the Nifty 50, stock
+comparison, IPOs with GMP, mutual funds, a screener, an earnings calendar, five calculators,
+beginner guides and a glossary, a watchlist, a portfolio tracker (XIRR, allocation, dividends,
+Portfolio AI) and price alerts — the same features as the website.
 
 **Stack:** Expo SDK 54 · expo-router 6 · TypeScript · NativeWind 4 (Tailwind) ·
 TanStack React Query 5 · Supabase Auth · react-native-mmkv · FlashList · Reanimated 4 ·
@@ -35,6 +38,11 @@ npx expo start                  # then press a (Android) / i (iOS)
 ```
 
 - **Expo Go** works for a quick look (storage uses AsyncStorage there).
+- **In a browser:** `npm run web`. The API only allows the website's own domains (CORS), so
+  a page on `localhost` can't call it directly. `npm run web` starts a small proxy on this
+  computer (`scripts/web-dev.mjs`, port 3999, localhost only) that forwards `/api/*` and adds
+  CORS headers for localhost pages. `API_TARGET=http://localhost:3001` proxies to a local
+  backend instead. The phone app doesn't need any of this: native apps aren't subject to CORS.
 - **A development build** uses MMKV for storage: `npx expo run:android` /
   `npx expo run:ios`, or `eas build --profile development`.
 - **Against a local API:** run the backend (`easyEquity server`, port 3001) and leave
@@ -88,18 +96,25 @@ apply, and the API already accepts the Supabase bearer token from any client.
 ```
 src/
   app/                 expo-router routes
-    (tabs)/            News · Markets · IPOs · Portfolio · More
+    (tabs)/            News (+ AI digest card) · Markets · IPOs · Portfolio · More
     (auth)/            sign-in, sign-up, forgot-password
-    article/[id]       story + "Explain simply" (AI)
-    stock/[symbol]     chart, key stats, AI analysis, watchlist ★, price alert ⏰
-    ipo/[slug]         GMP, issue details, timeline, subscription, reminders
-    mutual-funds/      search + fund page (NAV chart, 1/3/5-year returns)
-    search, screener, calculators, alerts, notifications, profile, pro, onboarding
+    article/[id]       story + "Explain simply" (AI) + related news
+    stock/[symbol]     scrubbable chart, key stats, 52W range, company profile & peers,
+                       AI analysis (with credits left), news, watchlist ★, alert ⏰, compare
+    ipo/[slug]         GMP (kostak, sauda), timeline, subscription by category, reminders
+    mutual-funds/      search + fund page (NAV chart and returns for 1M…All)
+    sectors/           AI sector outlook + Nifty 50 by NSE sector, sector pages
+    calculators/       SIP, SWP, CAGR, capital gains tax, brokerage & charges
+    learn/, glossary   beginner guides and market terms (same content as the website)
+    digest, stocks (Nifty 50), compare, calendar, market-holidays, search (stocks + news),
+    screener, alerts, notifications, profile, pro, onboarding
   api/                 client.ts (fetch + auth + errors), endpoints.ts (every API call), errors.ts
   components/          ui/ building blocks, news/, market/, ipo/, charts/, auth/
   constants/           theme (the website's palette), fonts, legal (shared with the website)
-  hooks/               React Query hooks per area (use-market, use-watchlist, use-portfolio …)
-  lib/                 supabase, storage, config, format, ipo, market-status, calculators
+  content/             learn guides (generated from the website's learn.tsx) and glossary
+  hooks/               React Query hooks per area (use-market, use-ai, use-portfolio, use-account …)
+  lib/                 supabase, storage, config, format, ipo, market-status, calculators,
+                       portfolio (XIRR), mutual-funds, nifty50, news-terms, ai
   providers/           Theme → Query → Auth
   queries/             QueryClient, query keys, what gets saved between launches
 ```
@@ -137,6 +152,11 @@ src/
   `/stock/[symbol]`. The website saves watchlist symbols in both forms, so matching uses the
   Yahoo form (a bare US ticker saved on the web is read as NSE — same as the website).
 - **`LEGAL_VERSION`** in `src/constants/legal.ts` must match the website's.
+- **Shared data with the website:** `src/lib/nifty50.ts` (after each index review),
+  `src/lib/calculators.ts` tax/charge rates (after each Budget), `src/content/glossary.ts`
+  and `src/content/learn.ts` (the guides, converted from the website's JSX).
+- **AI "warming up" answers** come back as HTTP 200 placeholders; `lib/ai.ts` spots them so
+  they are re-asked every 45 s and never saved to disk.
 - **NSE holidays** in `src/lib/market-status.ts`: update each December (same as the website).
 
 ## Payments

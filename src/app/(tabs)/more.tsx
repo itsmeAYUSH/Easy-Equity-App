@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/Button"
 import { Segmented } from "@/components/ui/Chips"
 import { ListGroup } from "@/components/ui/List"
 import { Eyebrow } from "@/components/ui/Notice"
+import { ToolGrid, type Tool } from "@/components/ui/ToolGrid"
 import { TabHeader } from "@/components/ui/TopBar"
 import { Tappable } from "@/components/ui/Tappable"
 import { Page } from "@/components/ui/Page"
@@ -20,6 +21,17 @@ import { useSession } from "@/lib/auth/session"
 import { useAppearance, type ThemeMode } from "@/lib/appearance"
 
 type IconName = keyof typeof Ionicons.glyphMap
+
+const TOOLS: Tool[] = [
+  { icon: "newspaper-outline", label: "Daily digest", href: "/digest" },
+  { icon: "grid-outline", label: "Sectors", href: "/sectors" },
+  { icon: "list-outline", label: "Nifty 50", href: "/stocks" },
+  { icon: "git-compare-outline", label: "Compare", href: "/compare" },
+  { icon: "funnel-outline", label: "Screener", href: "/screener" },
+  { icon: "calendar-outline", label: "Calendar", href: "/calendar" },
+  { icon: "pie-chart-outline", label: "Mutual funds", href: "/mutual-funds" },
+  { icon: "calculator-outline", label: "Calculators", href: "/calculators" },
+]
 
 export default function MoreScreen() {
   const { userId, profile, isPro, signOut } = useSession()
@@ -81,11 +93,16 @@ export default function MoreScreen() {
           <Row icon="diamond-outline" label={isPro ? "EasyEquity Pro" : "Upgrade to Pro"} href="/pro" last />
         </Group>
 
-        <Group title="Research">
-          <Row icon="search-outline" label="Search stocks & crypto" href="/search" />
-          <Row icon="funnel-outline" label="Stock screener" href="/screener" />
-          <Row icon="pie-chart-outline" label="Mutual funds" href="/mutual-funds" />
-          <Row icon="calculator-outline" label="SIP & CAGR calculators" href="/calculators" last />
+        <View className="mt-8">
+          <Eyebrow className="px-6 pb-2.5">Research tools</Eyebrow>
+          <ToolGrid tools={TOOLS} />
+        </View>
+
+        <Group title="Learn">
+          <Row icon="school-outline" label="Beginner guides" href="/learn" />
+          <Row icon="book-outline" label="Glossary" href="/glossary" />
+          <Row icon="calendar-clear-outline" label="Market holidays" href="/market-holidays" />
+          <Row icon="search-outline" label="Search stocks, crypto & news" href="/search" last />
         </Group>
 
         <Group title="Appearance">

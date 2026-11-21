@@ -6,19 +6,11 @@ import { useQuotes } from "@/hooks/use-market"
 import { useSession } from "@/lib/auth/session"
 import { toYahooSymbol } from "@/lib/format"
 import { haptics } from "@/lib/haptics"
+import { summarizePortfolio } from "@/lib/portfolio"
 import type { Holding } from "@/lib/types"
 import { qk } from "@/queries/keys"
 
-export type HoldingRow = Holding & {
-  yahoo: string
-  name: string | null
-  price: number | null
-  dayChangePct: number | null
-  invested: number
-  value: number | null
-  pnl: number | null
-  pnlPct: number | null
-}
+export type { HoldingRow } from "@/lib/portfolio"
 
 export function usePortfolio() {
   const { userId } = useSession()
@@ -32,45 +24,22 @@ export function usePortfolio() {
   const quotes = useQuotes(yahoo)
 
   /** Holdings joined with live quotes, and the totals — derived once per data change. */
-  const summary = useMemo(() => {
-    const bySymbol = new Map((quotes.data ?? []).map((q) => [q.symbol.toUpperCase(), q]))
-    const rows: HoldingRow[] = (holdings.data ?? []).map((h) => {
-      const y = toYahooSymbol(h.symbol)
-      const q = bySymbol.get(y.toUpperCase())
-      const invested = h.quantity * h.avg_price
-      const value = q ? q.price * h.quantity : null
-      const pnl = value != null ? value - invested : null
-      return {
-        ...h,
-        yahoo: y,
-        name: q?.name ?? null,
-        price: q?.price ?? null,
-        dayChangePct: q?.changePercent ?? null,
-        invested,
-        value,
-        pnl,
-        pnlPct: pnl != null && invested > 0 ? (pnl / invested) * 100 : null,
-      }
-    })
-    const invested = rows.reduce((s, r) => s + r.invested, 0)
-    const priced = rows.filter((r) => r.value != null)
-    const value = priced.reduce((s, r) => s + (r.value ?? 0), 0) + rows.filter((r) => r.value == null).reduce((s, r) => s + r.invested, 0)
-    const dayChange = priced.reduce((s, r) => {
-      const pct = r.dayChangePct ?? 0
-      const prev = (r.value ?? 0) / (1 + pct / 100)
-      return s + ((r.value ?? 0) - prev)
-    }, 0)
-    return {
-      rows,
-      invested,
-      value,
-      pnl: value - invested,
-      pnlPct: invested > 0 ? ((value - invested) / invested) * 100 : 0,
-      dayChange,
-    }
-  }, [holdings.data, quotes.data])
+  const summary = useMemo(() => summarizePortfolio(holdings.data ?? [], quotes.data ?? []), [holdings.data, quotes.data])
 
   return { holdings, quotes, ...summary }
+}
+
+/** Dividends paid in the last 12 months on what the user holds (re-asked when holdings change). */
+export function useDividends(holdings: Holding[]) {
+  const { userId } = useSession()
+  const holdingsKey = holdings.map((h) => `${h.symbol}:${h.quantity}`).join(",")
+  return useQuery({
+    queryKey: qk.dividends(userId, holdingsKey),
+    queryFn: portfolioApi.dividends,
+    enabled: !!userId && holdingsKey !== "",
+    staleTime: 60 * 60_000,
+    retry: 1,
+  })
 }
 
 export function useAddHolding() {
@@ -92,12 +61,16 @@ export function useRemoveHolding() {
   return useMutation({
     mutationFn: portfolioApi.remove,
     onMutate: async (id: string) => {
+      haptics.tap()
       await client.cancelQueries({ queryKey: key })
       const previous = client.getQueryData<Holding[]>(key)
       client.setQueryData<Holding[]>(key, (old = []) => old.filter((h) => h.id !== id))
       return { previous }
     },
-    onError: (_e, _id, ctx) => ctx?.previous && client.setQueryData(key, ctx.previous),
+    onError: (_e, _id, ctx) => {
+      haptics.fail()
+      if (ctx?.previous) client.setQueryData(key, ctx.previous)
+    },
     onSettled: () => client.invalidateQueries({ queryKey: key }),
   })
 }

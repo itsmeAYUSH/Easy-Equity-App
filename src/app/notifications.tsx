@@ -18,6 +18,8 @@ import { useSession } from "@/lib/auth/session"
 import { timeAgo, toYahooSymbol } from "@/lib/format"
 import { useColors } from "@/lib/appearance"
 
+const isIpoNotification = (type: string) => /^ipo[_-]/i.test(type)
+
 export default function NotificationsScreen() {
   const { userId } = useSession()
   const notifications = useNotifications()
@@ -48,14 +50,15 @@ export default function NotificationsScreen() {
               shrinkTo={0.98}
               onPress={() => {
                 if (!item.is_read) markRead.mutate(item.id)
-                if (item.symbol && item.alert_type !== "ipo_reminder") {
-                  router.push({ pathname: "/stock/[symbol]", params: { symbol: toYahooSymbol(item.symbol) } })
-                }
+                if (!item.symbol) return
+                // IPO reminders (ipo_open, ipo_close, ipo_allotment, ipo_listing) carry the IPO's slug.
+                if (isIpoNotification(item.alert_type)) router.push({ pathname: "/ipo/[slug]", params: { slug: item.symbol } })
+                else router.push({ pathname: "/stock/[symbol]", params: { symbol: toYahooSymbol(item.symbol) } })
               }}
               className={`mx-4 flex-row gap-3 border-b border-border py-3 ${item.is_read ? "opacity-70" : ""}`}
             >
               <View className="h-9 w-9 items-center justify-center rounded-full bg-accent/15">
-                <Ionicons name={/ipo/i.test(item.alert_type) ? "rocket-outline" : "alarm-outline"} size={18} color={p.accent} />
+                <Ionicons name={isIpoNotification(item.alert_type) ? "rocket-outline" : "alarm-outline"} size={18} color={p.accent} />
               </View>
               <View className="flex-1 gap-0.5">
                 <Text className={`text-sm text-foreground ${item.is_read ? "" : "font-semibold"}`}>{item.title}</Text>

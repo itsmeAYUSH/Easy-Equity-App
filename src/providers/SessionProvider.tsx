@@ -90,6 +90,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (error) throw new Error(explainAuthError(error.message))
   }, [])
 
+  const changePassword = useCallback(async (password: string) => {
+    const { error } = await supabase.auth.updateUser({ password })
+    if (error) throw new Error(explainAuthError(error.message))
+  }, [])
+
   const signOut = useCallback(async () => {
     await supabase.auth.signOut().catch(() => {})
     clearUserQueries()
@@ -111,10 +116,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       createAccount,
       continueWithGoogle,
       sendPasswordReset,
+      changePassword,
       signOut,
       refreshProfile,
     }),
-    [restoring, session, userId, profile, signInWithPassword, createAccount, continueWithGoogle, sendPasswordReset, signOut, refreshProfile],
+    [restoring, session, userId, profile, signInWithPassword, createAccount, continueWithGoogle, sendPasswordReset, changePassword, signOut, refreshProfile],
   )
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
@@ -126,5 +132,7 @@ function explainAuthError(message: string): string {
   if (/email not confirmed/i.test(message)) return "Please confirm your email first — check your inbox for the link."
   if (/user already registered/i.test(message)) return "An account with this email already exists. Sign in instead."
   if (/network|fetch/i.test(message)) return "Can't reach the sign-in service. Check your connection."
+  if (/different from the old password/i.test(message)) return "Choose a password different from your current one."
+  if (/reauthentication|recent login/i.test(message)) return "For your security, sign out and sign in again, then change your password."
   return message
 }
