@@ -10,23 +10,27 @@
         "EXPO_PUBLIC_SUPABASE_URL": "https://zxlszrmkgywpndytkjyp.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_sTBpDe_HKtMxcpRX8K3j9A_Sl-GzSFY",
         "EXPO_PUBLIC_SITE_URL": "https://www.easyequity.in.net"
-      }
+      },
+      "channel": "base"
     },
     "development": {
       "extends": "base",
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
       "extends": "base",
       "distribution": "internal",
       "android": {
         "buildType": "apk"
-      }
+      },
+      "channel": "preview"
     },
     "production": {
       "extends": "base",
-      "autoIncrement": true
+      "autoIncrement": true,
+      "channel": "production"
     }
   },
   "submit": {

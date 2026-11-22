@@ -71,11 +71,34 @@ EAS creates and keeps the signing key for you.
 - The public API/Supabase values the build needs are in `eas.json` (`build.base.env`);
   `.env.local` is not uploaded.
 
+## Update without a new APK (EAS Update)
+
+Builds made since EAS Update was set up check for new JavaScript each time the app opens.
+For changes to screens, logic, styles or images, publish an update instead of rebuilding:
+
+```bash
+npm run update:preview                        # message = last commit subject
+npm run update:preview -- "Fix sign-in copy"  # or your own message
+npm run update:production                     # Play Store (.aab) builds — only when ready
+```
+
+- Each build profile has a channel in `eas.json` (`preview` → APKs, `production` → `.aab`); an
+  update reaches only builds on its channel. APKs built **before** this setup never update:
+  install a new `npm run build:apk` once.
+- On the phone, close the app completely and reopen it. The first launch downloads the update
+  and the next one shows it, so it can take two cold starts.
+- Rebuild instead when a change is native: a new package with native code, an `app.json`
+  change (icon, splash, permissions, scheme), or an Expo SDK upgrade.
+- `runtimeVersion` follows `version` in `app.json` (currently `1.0.0`). Raising `version` means
+  older builds stop receiving updates, so raise it only together with a new build.
+- The script takes `EXPO_PUBLIC_*` from `eas.json`, the same values as the build, not from
+  `.env.local`, so a local API address there never reaches users.
+
 ## One-time setup outside the code
 
 | What | Where | Why |
 |---|---|---|
-| Add `easyequity://auth/callback` (and `exp://**` for Expo Go) | Supabase → Authentication → URL Configuration → Redirect URLs | Google sign-in returns to the app through this link. A link missing from this list is replaced by the Site URL, so the user lands on the website instead |
+| Add `easyequity://auth/callback`, `exp://**` (Expo Go), `http://localhost:8081/**` (Expo web) | Supabase → Authentication → URL Configuration → Redirect URLs | Google sign-in returns to the app through this link. A link missing from this list is replaced by the Site URL, so the user lands on the website instead. Supabase's wildcards skip IP addresses, so Expo Go over a LAN IP (`exp://192.168…`) can't return: use a development build or `npx expo start --tunnel` |
 | Site URL `https://www.easyequity.in.net` | Supabase → Authentication → URL Configuration → Site URL | The fallback above, and where confirmation emails lead; it must not be an old domain such as the `vercel.app` one |
 | App id `net.in.easyequity.app` | `app.json` (`ios.bundleIdentifier`, `android.package`) | Taken from the domain easyequity.in.net; change it before the first store build if you want another |
 | `eas init` | once, in this folder | Links the project to your Expo account for EAS builds |

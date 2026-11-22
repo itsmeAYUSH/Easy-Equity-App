@@ -65,6 +65,9 @@
         "projectId": "c42ac3e9-8422-4906-9731-06f30d7e8005"
       }
     },
-    "owner": "itsmeayushs-team"
+    "owner": "itsmeayushs-team",
+    "updates": {
+      "url": "https://u.expo.dev/c42ac3e9-8422-4906-9731-06f30d7e8005"
+    }
   }
 }
